@@ -4,6 +4,7 @@
  */
 
 import net from 'net';
+import os from 'os';
 import { BraviaEmulator } from './bravia-emulator.js';
 import { SSIP } from './ssip-protocol.js';
 
@@ -18,6 +19,22 @@ class SSIPServer {
     this.server = null;
   }
 
+  getNetworkAddresses() {
+    const interfaces = os.networkInterfaces();
+    const addresses = [];
+
+    for (const name of Object.keys(interfaces)) {
+      for (const iface of interfaces[name]) {
+        // Skip internal and non-IPv4 addresses
+        if (iface.family === 'IPv4' && !iface.internal) {
+          addresses.push(iface.address);
+        }
+      }
+    }
+
+    return addresses;
+  }
+
   start() {
     this.server = net.createServer((socket) => this.handleConnection(socket));
 
@@ -30,11 +47,22 @@ class SSIPServer {
     });
 
     this.server.listen(this.port, this.host, () => {
+      const addresses = this.getNetworkAddresses();
+
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       console.log('  Sony Bravia SSIP Emulator');
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-      console.log(`  Listening on ${this.host}:${this.port}`);
+      console.log(`  Port: ${this.port}`);
       console.log(`  Protocol: SSIP (Simple Single-wire IP)`);
+      console.log('');
+      console.log('  Network Addresses:');
+      console.log(`    localhost:${this.port}`);
+      console.log(`    127.0.0.1:${this.port}`);
+      if (addresses.length > 0) {
+        addresses.forEach(addr => {
+          console.log(`    ${addr}:${this.port}`);
+        });
+      }
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       console.log('');
       console.log('Test connection:');

@@ -62,6 +62,13 @@ export class BraviaEmulator {
    */
   notifyAllClients(command, value) {
     const packet = buildNotifyPacket(command, value);
+
+    // Log notification
+    const notifyPacket = parsePacket(packet);
+    if (notifyPacket) {
+      console.log(`→ NOTIFY: *S${notifyPacket.messageType}${notifyPacket.command}${notifyPacket.parametersHex.toUpperCase()}`);
+    }
+
     this.clients.forEach(client => {
       if (client.writable) {
         client.write(packet);
@@ -82,18 +89,32 @@ export class BraviaEmulator {
       return null;
     }
 
-    this.log(`Received: ${packet.messageType} ${packet.command} ${packet.parametersHex}`);
+    // Log incoming command
+    console.log(`← RX: *S${packet.messageType}${packet.command}${packet.parametersHex.toUpperCase()}`);
 
     // Route to appropriate handler based on message type
+    let response;
     switch (packet.messageTypeByte) {
       case SSIP.MESSAGE_TYPES.CONTROL:
-        return this.handleControl(packet);
+        response = this.handleControl(packet);
+        break;
       case SSIP.MESSAGE_TYPES.ENQUIRY:
-        return this.handleEnquiry(packet);
+        response = this.handleEnquiry(packet);
+        break;
       default:
         this.log(`Unhandled message type: ${packet.messageType}`);
         return null;
     }
+
+    // Log outgoing response
+    if (response) {
+      const respPacket = parsePacket(response);
+      if (respPacket) {
+        console.log(`→ TX: *S${respPacket.messageType}${respPacket.command}${respPacket.parametersHex.toUpperCase()}`);
+      }
+    }
+
+    return response;
   }
 
   /**

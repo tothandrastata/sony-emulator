@@ -1,7 +1,14 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm init:*)"
+      "Bash(npm init:*)",
+      "Bash(node:*)",
+      "Bash(cat:*)",
+      "Bash(pkill:*)",
+      "Bash(lsof:*)",
+      "Bash(xargs kill -9)",
+      "Bash(netstat:*)",
+      "Bash(xargs:*)"
     ]
   }
 }
