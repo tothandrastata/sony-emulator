@@ -1,0 +1,14 @@
+{
+  "name": "sony-bravia-ssip-emulator",
+  "version": "1.0.0",
+  "description": "Sony Bravia SSIP (Simple Single-wire IP) TCP Server Emulator",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "keywords": ["sony", "bravia", "ssip", "emulator", "tcp", "server"],
+  "author": "",
+  "license": "ISC"
+}
