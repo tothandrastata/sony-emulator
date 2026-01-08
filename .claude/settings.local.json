@@ -8,7 +8,20 @@
       "Bash(lsof:*)",
       "Bash(xargs kill -9)",
       "Bash(netstat:*)",
-      "Bash(xargs:*)"
+      "Bash(xargs:*)",
+      "Bash(powershell -Command:*)",
+      "Bash(dir \"C:\\\\Taurus\\\\LARA\\\\sony-emulator\\\\lara-driver\\\\*.zip\")",
+      "Bash(ls:*)",
+      "Bash(dir:*)",
+      "Bash(npm install:*)",
+      "Bash(timeout 5 node:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm start)",
+      "Bash(findstr:*)",
+      "Bash(taskkill:*)",
+      "Bash(curl:*)",
+      "Bash(nc:*)",
+      "Bash(python -m json.tool:*)"
     ]
   }
 }

@@ -1,0 +1,274 @@
+{
+  "Schemas": {},
+  "Devices": {
+    "SonyEmulator": {
+      "name": "SonyEmulator",
+      "type": "group",
+      "children": {
+        "serverRunning": {
+          "feId": "3aac506b-3680-4ed0-bcd1-5a8ebb9a3a68",
+          "valueType": "boolean",
+          "defaultValue": false,
+          "description": "TCP server running status",
+          "orderId": 0,
+          "type": "variable"
+        },
+        "connectedClients": {
+          "feId": "a291a984-53db-4a11-ac27-dee2196b14d1",
+          "valueType": "integer",
+          "defaultValue": 0,
+          "description": "Number of connected TCP clients",
+          "orderId": 1,
+          "type": "variable"
+        },
+        "powerStatus": {
+          "feId": "00fd9dad-3004-4035-bb62-f72acf8bf33e",
+          "valueType": "string",
+          "defaultValue": "Off",
+          "description": "Current power status",
+          "orderId": 2,
+          "type": "variable"
+        },
+        "volumeLevel": {
+          "feId": "8bc0832e-0841-482d-86f4-5366a518a30c",
+          "valueType": "integer",
+          "defaultValue": 15,
+          "description": "Current volume level (0-100)",
+          "orderId": 3,
+          "type": "variable"
+        },
+        "muteStatus": {
+          "feId": "7214488a-c91f-4dec-85de-18cff236dceb",
+          "valueType": "string",
+          "defaultValue": "Unmuted",
+          "description": "Current mute status",
+          "orderId": 4,
+          "type": "variable"
+        },
+        "inputSource": {
+          "feId": "f9427ae0-cba1-484a-83e3-a867547dfb7b",
+          "valueType": "string",
+          "defaultValue": "HDMI 1",
+          "description": "Current input source",
+          "orderId": 5,
+          "type": "variable"
+        },
+        "sceneMode": {
+          "feId": "67abc9fb-2d5b-43d0-8799-602d420cdb8d",
+          "valueType": "string",
+          "defaultValue": "general",
+          "description": "Current scene mode",
+          "orderId": 6,
+          "type": "variable"
+        }
+      },
+      "extensions": {
+        "setMuteState": {
+          "feId": "f954d00e-8a5c-4af3-8f75-440f69174673",
+          "parameters": [
+            {
+              "orderId": 0,
+              "name": "state",
+              "description": "\"Muted\" / \"Unmuted\"",
+              "type": "string",
+              "defaultValue": ""
+            }
+          ],
+          "actions": {
+            "code": "",
+            "type": "code",
+            "steps": []
+          },
+          "description": "",
+          "returnType": "void",
+          "orderId": 0,
+          "type": "method"
+        },
+        "setPowerState": {
+          "feId": "67412484-b786-43e9-ae99-b56d5b7aeb81",
+          "parameters": [
+            {
+              "orderId": 0,
+              "name": "state",
+              "description": "\"On\" / \"Off\"",
+              "type": "string",
+              "defaultValue": ""
+            }
+          ],
+          "actions": {
+            "code": "",
+            "type": "code",
+            "steps": []
+          },
+          "description": "",
+          "returnType": "void",
+          "orderId": 1,
+          "type": "method"
+        },
+        "controlButtonClicked": {
+          "feId": "d4c946ec-25f1-424c-8729-a88f4163f19a",
+          "callbackParameters": [
+            {
+              "orderId": 0,
+              "name": "buttonId",
+              "type": "string",
+              "description": ""
+            }
+          ],
+          "actions": {
+            "code": "",
+            "type": "wizard",
+            "steps": []
+          },
+          "description": "",
+          "orderId": 0,
+          "parameterValues": {},
+          "type": "event"
+        },
+        "muteStatusChanged": {
+          "feId": "6b4f91f8-99e6-4da1-a176-8a94dde400fd",
+          "callbackParameters": [
+            {
+              "orderId": 0,
+              "name": "status",
+              "type": "string",
+              "description": "\"Muted\" or \"Unmuted\""
+            }
+          ],
+          "actions": {
+            "code": "",
+            "type": "wizard",
+            "steps": []
+          },
+          "description": "",
+          "orderId": 1,
+          "parameterValues": {},
+          "type": "event"
+        },
+        "powerStatusChanged": {
+          "feId": "74a1a07b-db4b-4139-9fd1-0a58b1822ce0",
+          "callbackParameters": [
+            {
+              "orderId": 0,
+              "name": "status",
+              "type": "string",
+              "description": "\"On\" or \"Off\""
+            }
+          ],
+          "actions": {
+            "code": "",
+            "type": "wizard",
+            "steps": []
+          },
+          "description": "",
+          "orderId": 2,
+          "parameterValues": {},
+          "type": "event"
+        }
+      },
+      "rules": [
+        {
+          "feId": "5b94c486-592a-4fda-8825-f427b99d0e3a",
+          "name": "react to muteStatusChange",
+          "enabled": true,
+          "actions": {
+            "type": "code",
+            "steps": [],
+            "code": "if (status == \"Muted\") {\n    this.instance.addClass(\"muteButton\", `selected`, this.instance.instanceId);\n    this.instance.removeClass(\"muteButton\", `deselected`, this.instance.instanceId);\n} else {\n    this.instance.addClass(\"muteButton\", `deselected`, this.instance.instanceId);\n    this.instance.removeClass(\"muteButton\", `selected`, this.instance.instanceId);\n} \n"
+          },
+          "triggers": [
+            {
+              "type": "event",
+              "details": {
+                "instanceId": "",
+                "event": "muteStatusChanged"
+              }
+            }
+          ],
+          "orderId": 0
+        },
+        {
+          "feId": "05a43bc4-5e12-41cc-8f08-6c2ab0ae8e8a",
+          "name": "react to powerStatusChange",
+          "enabled": true,
+          "actions": {
+            "code": "if (status == \"On\") {\n    this.instance.addClass(\"powerButton\", `selected`, this.instance.instanceId);\n    this.instance.removeClass(\"powerButton\", `deselected`, this.instance.instanceId);\n} else {\n    this.instance.addClass(\"powerButton\", `deselected`, this.instance.instanceId);\n    this.instance.removeClass(\"powerButton\", `selected`, this.instance.instanceId);\n} \n",
+            "type": "code",
+            "steps": []
+          },
+          "triggers": [
+            {
+              "type": "event",
+              "details": {
+                "instanceId": "",
+                "event": "powerStatusChanged"
+              }
+            }
+          ],
+          "condition": {},
+          "orderId": 1
+        },
+        {
+          "feId": "42729d29-e415-461c-9a40-a4853aa1858c",
+          "name": "react to button click",
+          "enabled": true,
+          "actions": {
+            "code": "console.log(\"Button clicked: \" + buttonId);\n\nif (buttonId == \"powerButton\") {\n    const currValue = await this.instance.variables[`powerStatus`].value;\n    const newValue =  currValue == \"On\" ? \"Off\" : \"On\";\n    await this.instance.setPowerState(newValue);\n}\n\n\nif (buttonId == \"muteButton\") {\n    const currValue = await this.instance.variables[`muteStatus`].value;\n    const newValue =  currValue == \"Muted\" ? \"Unmuted\" : \"Muted\";\n    await this.instance.setMuteState(newValue);\n}\n\n",
+            "type": "code",
+            "steps": []
+          },
+          "triggers": [
+            {
+              "type": "event",
+              "details": {
+                "instanceId": "",
+                "event": "controlButtonClicked"
+              }
+            }
+          ],
+          "orderId": 2
+        },
+        {
+          "feId": "e011522e-0873-485e-9498-556a3d8edd10",
+          "name": "muteStatusChanged",
+          "enabled": true,
+          "actions": {
+            "code": "console.log(\"Mute Status changed to \" + status);",
+            "type": "code",
+            "steps": []
+          },
+          "triggers": [
+            {
+              "type": "event",
+              "details": {
+                "instanceId": "",
+                "event": "muteStatusChanged"
+              }
+            }
+          ],
+          "orderId": 3
+        },
+        {
+          "feId": "e9311c34-d4ce-439f-b582-6aa12187d974",
+          "name": "powerStatusChanged",
+          "enabled": true,
+          "actions": {
+            "code": "console.log(\"Power Status changed to \" + status);",
+            "type": "code",
+            "steps": []
+          },
+          "triggers": [
+            {
+              "type": "event",
+              "details": {
+                "instanceId": "",
+                "event": "powerStatusChanged"
+              }
+            }
+          ],
+          "orderId": 4
+        }
+      ]
+    }
+  }
+}
