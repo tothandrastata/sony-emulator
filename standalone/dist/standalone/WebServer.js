@@ -69,6 +69,8 @@ class WebServer {
           serial: process.env.SERIAL_NUMBER || 'EMULATOR-001',
           version: process.env.VERSION || '1.0.0'
         },
+        clients: this.emulator.getClientCount(),
+        clientIPs: this.emulator.getClientIPs(),
         state
       };
     });

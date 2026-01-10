@@ -56,6 +56,24 @@
             color: #444;
         }
 
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .badge-info {
+            background: #3b82f6;
+            color: white;
+        }
+
         .controls-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
@@ -352,6 +370,14 @@
                     <span class="device-info-label">Version:</span>
                     <span id="device-version">1.0.0</span>
                 </div>
+                <div class="device-info-item">
+                    <span class="device-info-label">Connected Clients:</span>
+                    <span class="badge badge-success" id="client-count">0</span>
+                </div>
+                <div class="device-info-item" id="client-ips-container" style="display: none;">
+                    <span class="device-info-label">Client IPs:</span>
+                    <span id="client-ips">-</span>
+                </div>
             </div>
         </div>
 
@@ -455,17 +481,38 @@
             sceneMode: 'general'
         };
 
-        // Fetch current state
+        // Fetch current state and device info
         async function fetchState() {
             try {
-                const response = await fetch('/api/state');
+                const response = await fetch('/api/status');
                 const data = await response.json();
-                if (data.success) {
+                if (data.state) {
                     currentState = data.state;
                     updateUI();
+                    updateDeviceInfo(data);
                 }
             } catch (error) {
                 console.error('Failed to fetch state:', error);
+            }
+        }
+
+        // Update device info including connected clients
+        function updateDeviceInfo(data) {
+            if (data.device) {
+                document.getElementById('device-model').textContent = data.device.model;
+                document.getElementById('device-version').textContent = data.device.version;
+            }
+
+            // Update client count
+            const clientCount = data.clients || 0;
+            document.getElementById('client-count').textContent = clientCount;
+
+            // Update client IPs
+            if (data.clientIPs && data.clientIPs.length > 0) {
+                document.getElementById('client-ips-container').style.display = 'flex';
+                document.getElementById('client-ips').textContent = data.clientIPs.join(', ');
+            } else {
+                document.getElementById('client-ips-container').style.display = 'none';
             }
         }
 

@@ -55,6 +55,8 @@ chmod +x start.sh
 
 ## Configuration
 
+### Environment Variables
+
 Edit `.env` file to customize:
 
 ```env
@@ -72,6 +74,21 @@ SSIP_PORT=20060
 WEB_UI_ENABLED=true
 WEB_UI_HOST=0.0.0.0
 WEB_UI_PORT=8082
+```
+
+### Debug Logging
+
+By default, verbose SSIP protocol logging is **disabled** for cleaner output. To enable detailed RX/TX/NOTIFY packet logging for debugging:
+
+1. Edit `SonyEmulator.js`
+2. Change `this.debug = false;` to `this.debug = true;`
+3. Restart the emulator
+
+**With debug enabled**, you'll see:
+```
+[Emulator] ← RX: *SEPOWR23232323232323232323232323232323
+[Emulator] → TX: *SAPOWR30303030303030303030303030303030
+[Emulator] → NOTIFY: *SNPOWR30303030303030303030303030303031
 ```
 
 ## Production Build

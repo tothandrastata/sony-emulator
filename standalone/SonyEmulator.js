@@ -32,7 +32,7 @@ class BraviaEmulator {
     this.inputTypesReverse = { 'HDMI': 1, 'Composite': 3, 'Component': 4, 'Screen Mirroring': 5 };
 
     this.clients = new Set();
-    this.debug = true;
+    this.debug = false;  // Set to true for verbose logging
   }
 
   // ============================================================================
@@ -87,6 +87,30 @@ class BraviaEmulator {
   removeClient(client) {
     this.clients.delete(client);
     this.log(`Client disconnected. Total clients: ${this.clients.size}`);
+  }
+
+  /**
+   * Get number of connected clients
+   */
+  getClientCount() {
+    return this.clients.size;
+  }
+
+  /**
+   * Get list of connected client IPs
+   */
+  getClientIPs() {
+    const ips = [];
+    this.clients.forEach(client => {
+      if (client.remoteAddress) {
+        // Clean up IPv6-mapped IPv4 addresses
+        const ip = client.remoteAddress.replace('::ffff:', '');
+        if (!ips.includes(ip)) {
+          ips.push(ip);
+        }
+      }
+    });
+    return ips;
   }
 
   /**
