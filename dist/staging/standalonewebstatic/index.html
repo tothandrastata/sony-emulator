@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sony Bravia Display Emulator</title>
+    <style>
+        :root {
+            --primary-color: #000000; /* Sony Black */
+            --primary-hover: #333333;
+            --accent-color: #f0f2f5;
+            --text-main: #262626;
+            --text-secondary: #595959;
+            --success: #52c41a;
+            --error: #ff4d4f;
+            --warning: #faad14;
+            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #e6e6e6;
+            color: var(--text-main);
+            line-height: 1.5;
+            min-height: 100vh;
+            padding: 30px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 4px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 30px;
+            border-top: 6px solid var(--primary-color);
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .device-info {
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-item strong {
+            color: var(--text-main);
+        }
+
+        .badge {
+            background: var(--primary-color);
+            color: white;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 4px;
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .on {
+            background: var(--success);
+            box-shadow: 0 0 8px var(--success);
+        }
+
+        .off {
+            background: var(--error);
+            box-shadow: 0 0 8px var(--error);
+        }
+
+        .warn {
+            background: var(--warning);
+            box-shadow: 0 0 8px var(--warning);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 2px;
+            font-weight: 600;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 14px;
+            transition: opacity 0.2s;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--error);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .volume-box {
+            text-align: center;
+        }
+
+        .volume-val {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin: 10px 0;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            margin: 20px 0;
+            cursor: pointer;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 4px;
+            border: 2px solid #d9d9d9;
+            font-size: 16px;
+            outline: none;
+        }
+
+        select:focus {
+            border-color: var(--primary-color);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: white;
+            padding: 16px 24px;
+            border-radius: 4px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            display: none;
+            z-index: 1000;
+            border-left: 6px solid var(--primary-color);
+        }
+        
+        /* Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+        
+        .switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--success);
+        }
+        
+        input:focus + .slider {
+            box-shadow: 0 0 1px var(--success);
+        }
+        
+        input:checked + .slider:before {
+            -webkit-transform: translateX(24px);
+            -ms-transform: translateX(24px);
+            transform: translateX(24px);
+        }
+
+        @media (max-width: 600px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>📺 Sony Bravia Display Emulator</h1>
+            <div class="device-info">
+                <div class="info-item"><strong>Model:</strong> <span id="model">-</span></div>
+                <div class="info-item"><strong>Version:</strong> <span id="version">-</span></div>
+                <div class="info-item"><strong>Clients:</strong> <span class="badge" id="clientCount">0</span></div>
+                <div class="info-item"><strong>IPs:</strong> <span id="ips">-</span></div>
+            </div>
+            
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div>
+                        <strong>TCP Control Server <span id="tcpPortDisplay"></span></strong>
+                        <div style="font-size: 12px; color: #666; margin-top: 4px;">Port 20060</div>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <label class="switch">
+                            <input type="checkbox" id="tcpToggle" onchange="toggleTcp(this.checked)">
+                            <span class="slider round"></span>
+                        </label>
+                        <span id="tcpStatus" style="font-weight: 600; font-size: 14px; color: #666;">-</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="grid">
+            <!-- Power Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">⚡ Power Control</h2>
+                    <div class="status-pill">
+                        <div id="pwrDot" class="status-dot off"></div>
+                        <span id="pwrText">OFF</span>
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-success" onclick="cmd('power', 'On')">Power On</button>
+                    <button class="btn btn-danger" onclick="cmd('power', 'Off')">Power Off</button>
+                </div>
+            </div>
+
+            <!-- Volume Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">🔊 Volume</h2>
+                    <span class="status-pill" id="volDisplay">20</span>
+                </div>
+                <div class="volume-box">
+                    <div class="volume-val" id="volText">20</div>
+                    <input type="range" id="volSlider" min="0" max="100" oninput="updateVol(this.value)"
+                        onchange="cmd('volume', this.value)">
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="adjVol(-5)">-5</button>
+                        <button class="btn btn-primary" onclick="adjVol(5)">+5</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mute Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">🔇 Mute Control</h2>
+                    <div class="status-pill">
+                        <div id="muteDot" class="status-dot off"></div>
+                        <span id="muteText">UNMUTED</span>
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-warning" onclick="cmd('mute', 'Muted')">Mute</button>
+                    <button class="btn btn-success" onclick="cmd('mute', 'Unmuted')">Unmute</button>
+                </div>
+            </div>
+
+            <!-- Input Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">🔌 Input Source</h2>
+                    <span id="curInput" style="font-weight: 600; color: var(--primary-color);">HDMI 1</span>
+                </div>
+                <select id="inpSel" onchange="cmd('input', this.value)">
+                    <option value="HDMI 1">HDMI 1</option>
+                    <option value="HDMI 2">HDMI 2</option>
+                    <option value="HDMI 3">HDMI 3</option>
+                    <option value="HDMI 4">HDMI 4</option>
+                    <option value="Composite 1">Composite 1</option>
+                    <option value="Component 1">Component 1</option>
+                    <option value="Mirroring 1">Mirroring 1</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast">Action completed</div>
+
+    <script>
+        let state = {};
+
+        async function sync() {
+            try {
+                const res = await fetch('/api/status');
+                const data = await res.json();
+
+                document.getElementById('model').innerText = data.device.model;
+                document.getElementById('version').innerText = data.device.version;
+                document.getElementById('clientCount').innerText = data.clientCount;
+                document.getElementById('ips').innerText = data.clientIPs.join(', ') || 'None';
+
+                // Update TCP Toggle
+                if (data.tcpPort) {
+                    document.getElementById('tcpPortDisplay').innerText = `(Port ${data.tcpPort})`;
+                }
+                const tcpToggle = document.getElementById('tcpToggle');
+                const tcpStatus = document.getElementById('tcpStatus');
+                if (tcpToggle) {
+                    tcpToggle.checked = data.tcpServerEnabled;
+                    tcpStatus.innerText = data.tcpServerEnabled ? 'ENABLED' : 'DISABLED';
+                    tcpStatus.style.color = data.tcpServerEnabled ? 'var(--success)' : 'var(--text-secondary)';
+                }
+
+                state = data.state;
+                updateUI();
+            } catch (err) { console.error('Sync failed', err); }
+        }
+
+        async function toggleTcp(enabled) {
+            const endpoint = enabled ? '/api/tcp/enable' : '/api/tcp/disable';
+            try {
+                const res = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast(data.message);
+                    sync(); // refresh status immediately
+                } else {
+                    showToast('Error: ' + data.error);
+                    document.getElementById('tcpToggle').checked = !enabled; // revert
+                }
+            } catch (err) {
+                showToast('Network error');
+                document.getElementById('tcpToggle').checked = !enabled; // revert
+            }
+        }
+
+        function updateUI() {
+            // Power
+            const isOn = state.power == 1; // Logic change: simple 1/0
+            document.getElementById('pwrDot').className = 'status-dot ' + (isOn ? 'on' : 'off');
+            document.getElementById('pwrText').innerText = isOn ? 'ON' : 'OFF';
+
+            // Volume
+            document.getElementById('volText').innerText = state.volume;
+            document.getElementById('volSlider').value = state.volume;
+            document.getElementById('volDisplay').innerText = state.volume;
+
+            // Mute
+            const isMuted = state.mute == 1;
+            document.getElementById('muteDot').className = 'status-dot ' + (isMuted ? 'warn' : 'on');
+            document.getElementById('muteText').innerText = isMuted ? 'MUTED' : 'UNMUTED';
+
+            // Input
+            const typeNames = { 1: 'HDMI', 3: 'Composite', 4: 'Component', 5: 'Mirroring' };
+            const type = state.input.type;
+            const num = state.input.number;
+            const inputName = (typeNames[type] || 'Unknown') + ' ' + num;
+            
+            document.getElementById('curInput').innerText = inputName;
+            
+            // Try to set select val
+            const sel = document.getElementById('inpSel');
+            // If option exists select it
+            let found = false;
+            for(let i=0; i<sel.options.length; i++) {
+                if(sel.options[i].value === inputName) {
+                    sel.selectedIndex = i;
+                    found = true;
+                    break;
+                }
+            }
+        }
+
+        async function cmd(endpoint, value) {
+            try {
+                const res = await fetch(`/api/${endpoint}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ value })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    state = data.state;
+                    updateUI();
+                    showToast(`${endpoint} updated`);
+                } else {
+                    showToast('Error: ' + data.error);
+                }
+            } catch (err) { showToast('Error sending command'); }
+        }
+
+        function updateVol(v) { document.getElementById('volText').innerText = v; }
+        function adjVol(d) { cmd('volume', Math.max(0, Math.min(100, state.volume + d))); }
+
+        function showToast(m) {
+            const t = document.getElementById('toast');
+            t.innerText = m;
+            t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 3000);
+        }
+
+        setInterval(sync, 2000);
+        sync();
+    </script>
+</body>
+
+</html>

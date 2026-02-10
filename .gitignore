@@ -27,3 +27,5 @@ pids
 # OS
 .DS_Store
 Thumbs.db
+
+!sony-bravia-ssip-emulator-v1.0.0.zip
