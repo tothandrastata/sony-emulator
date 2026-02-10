@@ -70,8 +70,13 @@ export class BraviaEmulator {
     }
 
     this.clients.forEach(client => {
-      if (client.writable) {
-        client.write(packet);
+      try {
+        if (client.writable) {
+          client.write(packet);
+        }
+      } catch (err) {
+        console.error('[Emulator] Error sending notification to client:', err.message);
+        this.clients.delete(client); // Cleanup dead client if write fails
       }
     });
   }
@@ -123,6 +128,12 @@ export class BraviaEmulator {
   handleControl(packet) {
     const { command, parameters, parametersDecimal } = packet;
 
+    // Reject specific commands if power is off
+    if (this.state.power === 0 && ['VOLU', 'AMUT', 'INPT'].includes(command)) {
+      this.log(`Rejecting ${command} (Power is OFF)`);
+      return buildErrorPacket(command);
+    }
+
     switch (command) {
       case SSIP.COMMANDS.POWR:
         return this.setPowerStatus(parametersDecimal);
@@ -153,6 +164,12 @@ export class BraviaEmulator {
    */
   handleEnquiry(packet) {
     const { command } = packet;
+
+    // Reject specific commands if power is off
+    if (this.state.power === 0 && ['VOLU', 'AMUT', 'INPT'].includes(command)) {
+      this.log(`Rejecting ${command} (Power is OFF)`);
+      return buildErrorPacket(command);
+    }
 
     switch (command) {
       case SSIP.COMMANDS.POWR:

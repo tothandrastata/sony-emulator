@@ -56,6 +56,7 @@ export class TcpServer {
 
       // Forcefully close all active connections
       for (const socket of this.sockets) {
+        this.emulator.removeClient(socket);
         socket.destroy();
       }
       this.sockets.clear();

@@ -27,7 +27,7 @@ export const SSIP = {
 
   ANSWERS: {
     SUCCESS: Buffer.alloc(16, 0x00),
-    ERROR: Buffer.alloc(16, 0xFF)
+    ERROR: Buffer.from('FFFFFFFFFFFFFFFF')
   }
 };
 
