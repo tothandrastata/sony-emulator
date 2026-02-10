@@ -9,8 +9,14 @@ import fastifyCors from '@fastify/cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+import fs from 'fs';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Read package.json
+const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json'), 'utf8'));
+const version = packageJson.version;
 
 export class WebServer {
     constructor(emulator, tcpServer, config = {}) {
@@ -18,7 +24,7 @@ export class WebServer {
         this.tcpServer = tcpServer; // TcpServer instance
         this.config = {
             host: config.host || '0.0.0.0',
-            port: config.port || 8085, // Default to 8085 to avoid conflict with Panasonic (8084)
+            port: config.port || 8082, // Default to 8082 to match Nginx and avoid conflict with Panasonic (8084) / LG (8085)
         };
         this.app = Fastify({
             logger: false
@@ -37,6 +43,9 @@ export class WebServer {
         this.app.register(fastifyStatic, {
             root: path.join(__dirname, 'standalonewebstatic'),
             prefix: '/',
+            cacheControl: false,
+            etag: false,
+            lastModified: false
         });
 
         // API Routes
@@ -46,7 +55,7 @@ export class WebServer {
                 const status = {
                     device: {
                         model: 'Sony Bravia Emulator',
-                        version: '1.0.0',
+                        version: version,
                     },
                     clientCount: this.emulator.clients.size,
                     clientIPs: Array.from(this.emulator.clients).map(s => s.remoteAddress),
@@ -128,9 +137,10 @@ export class WebServer {
                     // For now, let's manually update state and notify.
 
                     // Construct pseudo-buffer params for notify
-                    const params = Buffer.alloc(16, 0);
-                    params[0] = type;
-                    params[4] = number;
+                    // Using ASCII format "000000TT000000NN" (8 chars Type + 8 chars Number)
+                    const typeStr = type.toString().padStart(8, '0');
+                    const numStr = number.toString().padStart(8, '0');
+                    const params = Buffer.from(typeStr + numStr);
 
                     this.emulator.setInput(params);
 

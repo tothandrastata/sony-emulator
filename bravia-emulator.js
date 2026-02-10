@@ -249,18 +249,23 @@ export class BraviaEmulator {
   // ============================================================================
 
   setInput(params) {
-    // Parse input type and number from parameters
-    // Format: [type][0x00][0x00][0x00][number][0x00]...
-    // Also handle ASCII formats where params contains '1', '0' etc.
-    let type = params[0];
-    let number = params[4];
+    this.log(`setInput raw params: ${params.toString('hex')} (ASCII: ${params.toString('ascii').replace(/[^\x20-\x7E]/g, '.')})`);
+    let type, number;
+    const paramStr = params.toString('ascii');
 
-    // Heuristic: If values are ASCII digits (48-57), convert them
-    if (type >= 48 && type <= 57) {
-      type -= 48;
-    }
-    if (number >= 48 && number <= 57) {
-      number -= 48;
+    // Check if parameters are ASCII digits (Sony typically uses 16-byte numeric strings for some commands)
+    // Client seems to send "0000000100000001" for HDMI 1 (Type 1, Number 1)
+    if (/^\d{16}$/.test(paramStr)) {
+      type = parseInt(paramStr.slice(0, 8), 10);
+      number = parseInt(paramStr.slice(8, 16), 10);
+    } else {
+      // Fallback to binary/mixed parsing
+      type = params[0];
+      number = params[4];
+
+      // Handle single-digit ASCII (old heuristic)
+      if (type >= 48 && type <= 57) type -= 48;
+      if (number >= 48 && number <= 57) number -= 48;
     }
 
     // Protection against invalid types
@@ -283,9 +288,10 @@ export class BraviaEmulator {
   }
 
   getInput() {
-    const params = Buffer.alloc(16, 0);
-    params[0] = this.state.input.type;
-    params[4] = this.state.input.number;
+    // Return ASCII format "000000TT000000NN"
+    const typeStr = this.state.input.type.toString().padStart(8, '0');
+    const numStr = this.state.input.number.toString().padStart(8, '0');
+    const params = Buffer.from(typeStr + numStr);
 
     return buildAnswerPacket(SSIP.COMMANDS.INPT, params);
   }

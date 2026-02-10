@@ -6,18 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sony Bravia Display Emulator</title>
     <style>
-        :root {
-            --primary-color: #000000; /* Sony Black */
-            --primary-hover: #333333;
-            --accent-color: #f0f2f5;
-            --text-main: #262626;
-            --text-secondary: #595959;
-            --success: #52c41a;
-            --error: #ff4d4f;
-            --warning: #faad14;
-            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -25,12 +13,12 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: #e6e6e6;
-            color: var(--text-main);
-            line-height: 1.5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #a50034 0%, #E6007E 100%);
+            /* LG BG Colors but maybe clearer if we keep it generic? User asked to use LG scheme, so I will use LG scheme exactly */
+            /* Actually, Sony brand color is usually generic black or maybe different. But request says "use the UI / CSS scheme in ... lg-signage-emulator". So I will copy LG colors. */
             min-height: 100vh;
-            padding: 30px 20px;
+            padding: 20px;
         }
 
         .container {
@@ -40,58 +28,67 @@
 
         .header {
             background: white;
-            padding: 30px;
-            border-radius: 4px;
-            box-shadow: var(--card-shadow);
-            margin-bottom: 30px;
-            border-top: 6px solid var(--primary-color);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
         }
 
         .header h1 {
+            color: #333;
             font-size: 28px;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
+            margin-bottom: 10px;
         }
 
         .device-info {
             display: flex;
-            gap: 25px;
-            flex-wrap: wrap;
+            gap: 30px;
+            margin-top: 15px;
+            color: #666;
             font-size: 14px;
-            color: var(--text-secondary);
+            flex-wrap: wrap;
         }
 
-        .info-item {
+        .device-info-item {
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .info-item strong {
-            color: var(--text-main);
+        .device-info-label {
+            font-weight: 600;
+            color: #444;
         }
 
         .badge {
-            background: var(--primary-color);
-            color: white;
-            padding: 2px 10px;
-            border-radius: 12px;
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
             font-weight: 600;
         }
 
-        .grid {
+        .badge-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .badge-info {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .controls-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-            gap: 24px;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
         }
 
         .card {
             background: white;
-            border-radius: 4px;
-            padding: 24px;
-            box-shadow: var(--card-shadow);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         .card-header {
@@ -100,145 +97,278 @@
             align-items: center;
             margin-bottom: 20px;
             padding-bottom: 15px;
-            border-bottom: 1px solid #f0f0f0;
+            border-bottom: 2px solid #a50034;
         }
 
         .card-title {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            color: #333;
         }
 
-        .status-pill {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 600;
-            font-size: 15px;
-        }
-
-        .status-dot {
-            width: 10px;
-            height: 10px;
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
             border-radius: 50%;
+            margin-right: 8px;
         }
 
-        .on {
-            background: var(--success);
-            box-shadow: 0 0 8px var(--success);
+        .status-indicator.on {
+            background-color: #4caf50;
+            box-shadow: 0 0 8px #4caf50;
         }
 
-        .off {
-            background: var(--error);
-            box-shadow: 0 0 8px var(--error);
+        .status-indicator.off {
+            background-color: #f44336;
+            box-shadow: 0 0 8px #f44336;
         }
 
-        .warn {
-            background: var(--warning);
-            box-shadow: 0 0 8px var(--warning);
+        .status-indicator.muted {
+            background-color: #f90;
+            box-shadow: 0 0 8px #f90;
         }
 
-        .btn-group {
+        .status-indicator.unmuted {
+            background-color: #4caf50;
+            box-shadow: 0 0 8px #4caf50;
+        }
+
+        .status-text {
             display: flex;
-            gap: 12px;
+            align-items: center;
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: #555;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-label {
+            display: block;
+            font-weight: 600;
+            color: #444;
+            margin-bottom: 10px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
         .btn {
-            flex: 1;
-            padding: 12px;
+            padding: 12px 24px;
             border: none;
-            border-radius: 2px;
+            border-radius: 8px;
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-size: 14px;
-            transition: opacity 0.2s;
-        }
-        
-        .btn:hover {
-            opacity: 0.9;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 100px;
         }
 
         .btn-primary {
-            background: var(--primary-color);
+            background-color: #a50034;
             color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #8b002c;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(165, 0, 52, 0.3);
         }
 
         .btn-success {
-            background: var(--success);
+            background-color: #4caf50;
             color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
         }
 
         .btn-danger {
-            background: var(--error);
+            background-color: #f44336;
             color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #da190b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(244, 67, 54, 0.3);
         }
 
         .btn-warning {
-            background: var(--warning);
+            background-color: #f90;
             color: white;
         }
 
-        .volume-box {
+        .btn-warning:hover {
+            background-color: #e68a00;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(255, 153, 0, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .volume-control {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .volume-display {
             text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: #a50034;
         }
 
-        .volume-val {
-            font-size: 48px;
-            font-weight: 800;
-            color: var(--primary-color);
-            margin: 10px 0;
-        }
-
-        input[type="range"] {
+        .volume-slider {
             width: 100%;
-            margin: 20px 0;
-            cursor: pointer;
+            height: 8px;
+            border-radius: 5px;
+            background: #e0e0e0;
+            outline: none;
+            -webkit-appearance: none;
         }
 
-        select {
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #a50034;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .volume-slider::-webkit-slider-thumb:hover {
+            background: #8b002c;
+            transform: scale(1.2);
+        }
+
+        .volume-slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #a50034;
+            cursor: pointer;
+            border: none;
+        }
+
+        .volume-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .volume-btn {
+            width: 50px;
+            height: 50px;
+            border: none;
+            border-radius: 50%;
+            background-color: #a50034;
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .volume-btn:hover {
+            background-color: #8b002c;
+            transform: scale(1.1);
+        }
+
+        .input-control select {
             width: 100%;
             padding: 12px;
-            border-radius: 4px;
-            border: 2px solid #d9d9d9;
-            font-size: 16px;
-            outline: none;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.3s ease;
         }
 
-        select:focus {
-            border-color: var(--primary-color);
+        .input-control select:focus {
+            outline: none;
+            border-color: #a50034;
         }
 
         .toast {
             position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: white;
-            padding: 16px 24px;
-            border-radius: 4px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-            display: none;
+            bottom: 20px;
+            right: 20px;
+            background-color: #333;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             z-index: 1000;
-            border-left: 6px solid var(--primary-color);
+            animation: slideIn 0.3s ease;
         }
-        
-        /* Switch */
+
+        .toast.error {
+            background-color: #f44336;
+        }
+
+        .toast.success {
+            background-color: #4caf50;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* TCP Switch - Adapted to sit in header */
+        .tcp-control {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        /* Switch CSS */
         .switch {
             position: relative;
             display: inline-block;
             width: 50px;
             height: 26px;
         }
-        
-        .switch input { 
+
+        .switch input {
             opacity: 0;
             width: 0;
             height: 0;
         }
-        
+
         .slider {
             position: absolute;
             cursor: pointer;
@@ -251,7 +381,7 @@
             transition: .4s;
             border-radius: 34px;
         }
-        
+
         .slider:before {
             position: absolute;
             content: "";
@@ -264,159 +394,250 @@
             transition: .4s;
             border-radius: 50%;
         }
-        
-        input:checked + .slider {
-            background-color: var(--success);
+
+        input:checked+.slider {
+            background-color: #10b981;
         }
-        
-        input:focus + .slider {
-            box-shadow: 0 0 1px var(--success);
+
+        input:focus+.slider {
+            box-shadow: 0 0 1px #10b981;
         }
-        
-        input:checked + .slider:before {
+
+        input:checked+.slider:before {
             -webkit-transform: translateX(24px);
             -ms-transform: translateX(24px);
             transform: translateX(24px);
-        }
-
-        @media (max-width: 600px) {
-            .grid {
-                grid-template-columns: 1fr;
-            }
-
-            .header {
-                padding: 20px;
-            }
         }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <header class="header">
+        <!-- Header -->
+        <div class="header">
             <h1>📺 Sony Bravia Display Emulator</h1>
             <div class="device-info">
-                <div class="info-item"><strong>Model:</strong> <span id="model">-</span></div>
-                <div class="info-item"><strong>Version:</strong> <span id="version">-</span></div>
-                <div class="info-item"><strong>Clients:</strong> <span class="badge" id="clientCount">0</span></div>
-                <div class="info-item"><strong>IPs:</strong> <span id="ips">-</span></div>
-            </div>
-            
-            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <div>
-                        <strong>TCP Control Server <span id="tcpPortDisplay"></span></strong>
-                        <div style="font-size: 12px; color: #666; margin-top: 4px;">Port 20060</div>
-                    </div>
-                    
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <label class="switch">
-                            <input type="checkbox" id="tcpToggle" onchange="toggleTcp(this.checked)">
-                            <span class="slider round"></span>
-                        </label>
-                        <span id="tcpStatus" style="font-weight: 600; font-size: 14px; color: #666;">-</span>
-                    </div>
+                <div class="device-info-item">
+                    <span class="device-info-label">Model:</span>
+                    <span id="device-model">-</span>
+                </div>
+                <div class="device-info-item">
+                    <span class="device-info-label">Version:</span>
+                    <span id="device-version">-</span>
+                </div>
+                <div class="device-info-item">
+                    <span class="device-info-label">Connected Clients:</span>
+                    <span class="badge badge-success" id="client-count">0</span>
+                </div>
+                <div class="device-info-item" id="client-ips-container" style="display: none;">
+                    <span class="device-info-label">IPs:</span>
+                    <span id="client-ips">-</span>
                 </div>
             </div>
-        </header>
 
-        <div class="grid">
-            <!-- Power Card -->
+            <!-- TCP Control -->
+            <div class="tcp-control">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <strong>TCP Server (Port 20060)</strong>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <label class="switch">
+                        <input type="checkbox" id="tcpToggle" onchange="toggleTcp(this.checked)">
+                        <span class="slider round"></span>
+                    </label>
+                    <span id="tcpStatus" style="font-weight: 600; font-size: 14px; color: #666;">-</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls Grid -->
+        <div class="controls-grid">
+            <!-- Power Control -->
             <div class="card">
                 <div class="card-header">
                     <h2 class="card-title">⚡ Power Control</h2>
-                    <div class="status-pill">
-                        <div id="pwrDot" class="status-dot off"></div>
-                        <span id="pwrText">OFF</span>
-                    </div>
                 </div>
-                <div class="btn-group">
+                <div class="status-text">
+                    <span class="status-indicator" id="power-indicator"></span>
+                    <span id="power-status-text">OFF</span>
+                </div>
+                <div class="button-group">
                     <button class="btn btn-success" onclick="cmd('power', 'On')">Power On</button>
                     <button class="btn btn-danger" onclick="cmd('power', 'Off')">Power Off</button>
                 </div>
             </div>
 
-            <!-- Volume Card -->
+            <!-- Volume Control -->
             <div class="card">
                 <div class="card-header">
-                    <h2 class="card-title">🔊 Volume</h2>
-                    <span class="status-pill" id="volDisplay">20</span>
+                    <h2 class="card-title">🔊 Volume Control</h2>
                 </div>
-                <div class="volume-box">
-                    <div class="volume-val" id="volText">20</div>
-                    <input type="range" id="volSlider" min="0" max="100" oninput="updateVol(this.value)"
-                        onchange="cmd('volume', this.value)">
-                    <div class="btn-group">
-                        <button class="btn btn-primary" onclick="adjVol(-5)">-5</button>
-                        <button class="btn btn-primary" onclick="adjVol(5)">+5</button>
+                <div class="volume-control">
+                    <div class="volume-display">Volume: <span id="volume-value">15</span></div>
+                    <input type="range" min="0" max="100" value="15" class="volume-slider" id="volume-slider"
+                        oninput="updateVolumeDisplay(this.value)" onchange="cmd('volume', this.value)">
+                    <div class="volume-buttons">
+                        <button class="volume-btn" onclick="adjustVolume(-5)">−</button>
+                        <button class="volume-btn" onclick="adjustVolume(5)">+</button>
                     </div>
                 </div>
             </div>
 
-            <!-- Mute Card -->
+            <!-- Mute Control -->
             <div class="card">
                 <div class="card-header">
                     <h2 class="card-title">🔇 Mute Control</h2>
-                    <div class="status-pill">
-                        <div id="muteDot" class="status-dot off"></div>
-                        <span id="muteText">UNMUTED</span>
-                    </div>
                 </div>
-                <div class="btn-group">
+                <div class="status-text">
+                    <span class="status-indicator" id="mute-indicator"></span>
+                    <span id="mute-status-text">UNMUTED</span>
+                </div>
+                <div class="button-group">
                     <button class="btn btn-warning" onclick="cmd('mute', 'Muted')">Mute</button>
                     <button class="btn btn-success" onclick="cmd('mute', 'Unmuted')">Unmute</button>
                 </div>
             </div>
 
-            <!-- Input Card -->
+            <!-- Input Selection -->
             <div class="card">
                 <div class="card-header">
-                    <h2 class="card-title">🔌 Input Source</h2>
-                    <span id="curInput" style="font-weight: 600; color: var(--primary-color);">HDMI 1</span>
+                    <h2 class="card-title">🔌 Input Selection</h2>
                 </div>
-                <select id="inpSel" onchange="cmd('input', this.value)">
-                    <option value="HDMI 1">HDMI 1</option>
-                    <option value="HDMI 2">HDMI 2</option>
-                    <option value="HDMI 3">HDMI 3</option>
-                    <option value="HDMI 4">HDMI 4</option>
-                    <option value="Composite 1">Composite 1</option>
-                    <option value="Component 1">Component 1</option>
-                    <option value="Mirroring 1">Mirroring 1</option>
-                </select>
+                <div class="status-text">
+                    Current: <span id="input-current">HDMI 1</span>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Select Input:</label>
+                    <div class="input-control">
+                        <select id="input-select" onchange="cmd('input', this.value)">
+                            <option value="HDMI 1">HDMI 1</option>
+                            <option value="HDMI 2">HDMI 2</option>
+                            <option value="HDMI 3">HDMI 3</option>
+                            <option value="HDMI 4">HDMI 4</option>
+                            <option value="Composite 1">Composite 1</option>
+                            <option value="Component 1">Component 1</option>
+                            <option value="Mirroring 1">Mirroring 1</option>
+                        </select>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="toast" class="toast">Action completed</div>
-
     <script>
-        let state = {};
+        let currentState = {};
 
-        async function sync() {
+        async function fetchState() {
             try {
-                const res = await fetch('/api/status');
-                const data = await res.json();
+                const response = await fetch('/api/status');
+                const data = await response.json();
 
-                document.getElementById('model').innerText = data.device.model;
-                document.getElementById('version').innerText = data.device.version;
-                document.getElementById('clientCount').innerText = data.clientCount;
-                document.getElementById('ips').innerText = data.clientIPs.join(', ') || 'None';
-
-                // Update TCP Toggle
-                if (data.tcpPort) {
-                    document.getElementById('tcpPortDisplay').innerText = `(Port ${data.tcpPort})`;
+                // Device Info
+                if (data.device) {
+                    document.getElementById('device-model').textContent = data.device.model;
+                    document.getElementById('device-version').textContent = data.device.version;
                 }
+
+                // Client Info
+                document.getElementById('client-count').textContent = data.clientCount;
+                if (data.clientIPs && data.clientIPs.length > 0) {
+                    document.getElementById('client-ips-container').style.display = 'flex';
+                    document.getElementById('client-ips').textContent = data.clientIPs.join(', ');
+                } else {
+                    document.getElementById('client-ips-container').style.display = 'none';
+                }
+
+                // TCP Status
                 const tcpToggle = document.getElementById('tcpToggle');
                 const tcpStatus = document.getElementById('tcpStatus');
                 if (tcpToggle) {
+                    // Only set checked if we differ to avoid drag interruption? 
+                    // No, for a switch it's fine.
                     tcpToggle.checked = data.tcpServerEnabled;
-                    tcpStatus.innerText = data.tcpServerEnabled ? 'ENABLED' : 'DISABLED';
-                    tcpStatus.style.color = data.tcpServerEnabled ? 'var(--success)' : 'var(--text-secondary)';
+                    tcpStatus.textContent = data.tcpServerEnabled ? 'ENABLED' : 'DISABLED';
+                    tcpStatus.style.color = data.tcpServerEnabled ? '#10b981' : '#666';
                 }
 
-                state = data.state;
-                updateUI();
-            } catch (err) { console.error('Sync failed', err); }
+                if (data.state) {
+                    currentState = data.state;
+                    updateUI();
+                }
+            } catch (error) {
+                console.error('Failed to fetch state:', error);
+            }
+        }
+
+        function updateUI() {
+            // Power
+            const powerIndicator = document.getElementById('power-indicator');
+            const powerText = document.getElementById('power-status-text');
+            // Sony state.power is 1/0
+            const isOn = currentState.power == 1;
+            powerIndicator.className = 'status-indicator ' + (isOn ? 'on' : 'off');
+            powerText.textContent = isOn ? 'ON' : 'OFF';
+
+            // Volume
+            const volumeSlider = document.getElementById('volume-slider');
+            const volumeValue = document.getElementById('volume-value');
+            volumeSlider.value = currentState.volume;
+            volumeValue.textContent = currentState.volume;
+
+            // Mute
+            const muteIndicator = document.getElementById('mute-indicator');
+            const muteText = document.getElementById('mute-status-text');
+            const isMuted = currentState.mute == 1;
+            muteIndicator.className = 'status-indicator ' + (isMuted ? 'muted' : 'unmuted');
+            muteText.textContent = isMuted ? 'MUTED' : 'UNMUTED';
+
+            // Input
+            const typeNames = { 1: 'HDMI', 3: 'Composite', 4: 'Component', 5: 'Mirroring' };
+            const type = currentState.input.type;
+            const num = currentState.input.number;
+            const inputName = (typeNames[type] || 'Unknown') + ' ' + num;
+
+            document.getElementById('input-current').textContent = inputName;
+
+            // Sync selector if not focused?
+            const sel = document.getElementById('input-select');
+            if (document.activeElement !== sel) {
+                for (let i = 0; i < sel.options.length; i++) {
+                    if (sel.options[i].value === inputName) {
+                        sel.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+        }
+
+        async function cmd(endpoint, value) {
+            try {
+                const response = await fetch(`/api/${endpoint}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ value })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    currentState = data.state;
+                    updateUI();
+                    showToast(`${endpoint} updated`, 'success');
+                } else {
+                    showToast(`Error: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showToast('Command failed', 'error');
+            }
+        }
+
+        function updateVolumeDisplay(value) {
+            document.getElementById('volume-value').textContent = value;
+        }
+
+        function adjustVolume(delta) {
+            const current = parseInt(currentState.volume) || 0;
+            const newVol = Math.max(0, Math.min(100, current + delta));
+            updateVolumeDisplay(newVol); // immediate feedback
+            cmd('volume', newVol);
         }
 
         async function toggleTcp(enabled) {
@@ -429,85 +650,34 @@
                 });
                 const data = await res.json();
                 if (data.success) {
-                    showToast(data.message);
-                    sync(); // refresh status immediately
+                    showToast(data.message, 'success');
+                    fetchState(); // refresh
                 } else {
-                    showToast('Error: ' + data.error);
+                    showToast('Error: ' + data.error, 'error');
                     document.getElementById('tcpToggle').checked = !enabled; // revert
                 }
             } catch (err) {
-                showToast('Network error');
+                showToast('Network error', 'error');
                 document.getElementById('tcpToggle').checked = !enabled; // revert
             }
         }
 
-        function updateUI() {
-            // Power
-            const isOn = state.power == 1; // Logic change: simple 1/0
-            document.getElementById('pwrDot').className = 'status-dot ' + (isOn ? 'on' : 'off');
-            document.getElementById('pwrText').innerText = isOn ? 'ON' : 'OFF';
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
 
-            // Volume
-            document.getElementById('volText').innerText = state.volume;
-            document.getElementById('volSlider').value = state.volume;
-            document.getElementById('volDisplay').innerText = state.volume;
-
-            // Mute
-            const isMuted = state.mute == 1;
-            document.getElementById('muteDot').className = 'status-dot ' + (isMuted ? 'warn' : 'on');
-            document.getElementById('muteText').innerText = isMuted ? 'MUTED' : 'UNMUTED';
-
-            // Input
-            const typeNames = { 1: 'HDMI', 3: 'Composite', 4: 'Component', 5: 'Mirroring' };
-            const type = state.input.type;
-            const num = state.input.number;
-            const inputName = (typeNames[type] || 'Unknown') + ' ' + num;
-            
-            document.getElementById('curInput').innerText = inputName;
-            
-            // Try to set select val
-            const sel = document.getElementById('inpSel');
-            // If option exists select it
-            let found = false;
-            for(let i=0; i<sel.options.length; i++) {
-                if(sel.options[i].value === inputName) {
-                    sel.selectedIndex = i;
-                    found = true;
-                    break;
-                }
-            }
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
         }
 
-        async function cmd(endpoint, value) {
-            try {
-                const res = await fetch(`/api/${endpoint}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ value })
-                });
-                const data = await res.json();
-                if (data.success) {
-                    state = data.state;
-                    updateUI();
-                    showToast(`${endpoint} updated`);
-                } else {
-                    showToast('Error: ' + data.error);
-                }
-            } catch (err) { showToast('Error sending command'); }
-        }
+        // Auto-refresh every 2 seconds
+        setInterval(fetchState, 2000);
 
-        function updateVol(v) { document.getElementById('volText').innerText = v; }
-        function adjVol(d) { cmd('volume', Math.max(0, Math.min(100, state.volume + d))); }
-
-        function showToast(m) {
-            const t = document.getElementById('toast');
-            t.innerText = m;
-            t.style.display = 'block';
-            setTimeout(() => t.style.display = 'none', 3000);
-        }
-
-        setInterval(sync, 2000);
-        sync();
+        // Initial fetch
+        fetchState();
     </script>
 </body>
 

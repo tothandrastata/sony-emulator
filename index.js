@@ -6,6 +6,10 @@
 import { BraviaEmulator } from './bravia-emulator.js';
 import { TcpServer } from './TcpServer.js';
 import { WebServer } from './WebServer.js';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
 
 // Configuration
 const config = {
@@ -15,11 +19,12 @@ const config = {
 
   // Web UI
   webHost: process.env.WEB_HOST || '0.0.0.0',
-  webPort: parseInt(process.env.WEB_PORT || '8085', 10)
+  webPort: parseInt(process.env.WEB_PORT || '8082', 10)
 };
 
 // Create shared emulator instance
 const emulator = new BraviaEmulator();
+emulator.debug = true; // Ensure debug logging is on
 
 // Create servers
 const tcpServer = new TcpServer(emulator, {

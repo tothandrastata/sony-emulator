@@ -79,6 +79,7 @@ export class TcpServer {
     let buffer = Buffer.alloc(0);
 
     socket.on('data', (data) => {
+      console.log(`[TCP] RX Raw (${socket.remoteAddress}): ${data.toString('hex')}`);
       buffer = Buffer.concat([buffer, data]);
 
       // Process complete packets (24 bytes each)

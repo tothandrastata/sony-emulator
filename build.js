@@ -41,7 +41,9 @@ async function build() {
         'TcpServer.js',
         'WebServer.js',
         'README.md',
-        '.env.example'
+        '.env.example',
+        'start.sh',
+        'start.bat'
     ];
 
     for (const file of filesToCopy) {
@@ -62,6 +64,17 @@ async function build() {
         fs.cpSync(webSrc, path.join(stagingDir, 'standalonewebstatic'), { recursive: true });
     }
 
+    // Force LF line endings for .sh files (dos2unix equivalent)
+    const shFiles = ['start.sh'];
+    shFiles.forEach(file => {
+        const filePath = path.join(stagingDir, file);
+        if (fs.existsSync(filePath)) {
+            let content = fs.readFileSync(filePath, 'utf8');
+            content = content.replace(/\r\n/g, '\n');
+            fs.writeFileSync(filePath, content, 'utf8');
+        }
+    });
+
     // 3. Create distribution package.json
     console.log('3. Creating distribution package.json...');
     const distPkg = {
@@ -76,7 +89,8 @@ async function build() {
         dependencies: {
             fastify: '^4.29.1',
             '@fastify/static': '^6.12.0',
-            '@fastify/cors': '^8.5.0'
+            '@fastify/cors': '^8.5.0',
+            dotenv: '^16.4.1'
         },
         engines: {
             node: '>=16.0.0'
